@@ -4,8 +4,11 @@
 #include <worldprocessor.h>
 #include <QColor>
 #include <ICreatureBuilder.h>
+#include <QTimer>
 
 class RenderWorldUseCase : public QObject {
+
+    Q_OBJECT
 
 public:
     enum CellTypes {
@@ -16,12 +19,24 @@ public:
 
 public:
     RenderWorldUseCase(WorldProcessorUnq processor, ICreatureBuilderPtr builder);
+
     size_t lenght() const;
-    const Cell & get(size_t index) const;
     QColor getCellColor(size_t index) const;
+//    QColor getBorderColor(size_t index) const;
+    const WorldMap::WMap & map() const;
+
+signals:
+    void redrawWorld();
+
+private slots:
+    void updateWorld();
+    void worldDataReady(const WorldMap::WMap &map);
 private:
     WorldProcessorUnq m_processor;
     ICreatureBuilderPtr m_builder;
+    QTimer m_timer;
+    QElapsedTimer m_elapsedTimer;
+    WorldMap::WMap m_map;
 };
 
 

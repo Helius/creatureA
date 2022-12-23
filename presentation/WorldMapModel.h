@@ -22,6 +22,9 @@ public:
     QVariant data(const QModelIndex &index, int role) const override;
     QHash<int, QByteArray> roleNames() const override;
 
+private slots:
+    void update();
+
 private:
     RenderWorldUseCaseUnq m_usecase;
 };

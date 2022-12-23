@@ -1,12 +1,14 @@
 #include "WorldMapModel.h"
 #include "worldmap.h"
+#include <QDebug>
 
 
 WorldMapModel::WorldMapModel(RenderWorldUseCaseUnq usecase)
-: QAbstractListModel()
+    : QAbstractListModel()
     , m_usecase(std::move(usecase))
 {
     Q_ASSERT(m_usecase);
+    connect(m_usecase.get(), &RenderWorldUseCase::redrawWorld, this, &WorldMapModel::update);
 }
 
 int WorldMapModel::rowCount(const QModelIndex &) const
@@ -22,8 +24,8 @@ QVariant WorldMapModel::data(const QModelIndex &index, int role) const
     }
 
     switch(role) {
-    case BorderColor:
-        return m_usecase->getCellColor(ind);
+//    case BorderColor:
+//        return m_usecase->getBorderColor(ind);
     case MainColor:
         return m_usecase->getCellColor(ind);
     }
@@ -33,7 +35,23 @@ QVariant WorldMapModel::data(const QModelIndex &index, int role) const
 QHash<int, QByteArray> WorldMapModel::roleNames() const
 {
     return {
-        {BorderColor, "borderColor"},
+//        {BorderColor, "borderColor"},
         {MainColor, "mainColor"},
-    };
+        };
+}
+
+void WorldMapModel::update()
+{
+    static int prevRowCount = 0;
+    if (rowCount({}) != prevRowCount) {
+        qDebug() << "reset, rows" << prevRowCount << rowCount({});
+        beginResetModel();
+        endResetModel();
+        prevRowCount = rowCount({});
+    } else {
+        QElapsedTimer timer;
+        timer.start();
+        emit dataChanged(index(0), index(rowCount({})-1));
+        qDebug() << "Update model time:" << timer.elapsed() << "ms";
+    }
 }

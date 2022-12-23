@@ -5,7 +5,7 @@
 
 class CreatureBuilderImpl : public ICreatureBuilder {
 public:
-    CreatureBuilderImpl(WorldMapWeak wmWeak, IMotionPtr motion, ISensorPtr sensor, IDividerPtr divider);
+    CreatureBuilderImpl(WorldMapPtr wmap, IMotionPtr motion, ISensorPtr sensor, IDividerPtr divider);
 
     // ICreatureBuilder interface
 public:

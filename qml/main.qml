@@ -3,8 +3,8 @@ import injector
 import presenters
 
 Window {
-    width: 640
-    height: 480
+    width: 1024
+    height: 680
     visible: true
     title: qsTr("Hello World")
 
@@ -14,7 +14,7 @@ Window {
         sourceComponent: GridView {
             property WorldMapModel $worldModel
             model: $worldModel
-            width: 246*4
+            width: 256*4
             height: 128*4
             cellWidth: 4
             cellHeight: 4
@@ -22,8 +22,8 @@ Window {
             delegate: Rectangle {
                 width: 3
                 height: 3
-                border.width: 1
-                border.color: "gray"// model.borderColor
+//                border.width: 1
+//                border.color: model.borderColor
                 color: model.mainColor
             }
         }

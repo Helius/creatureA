@@ -2,8 +2,9 @@
 
 #include <array>
 #include <variant>
+#include <QtGlobal>
 #include "creature.h"
-#include "Direction.h"
+
 
 struct EmptySpace {
 };
@@ -11,27 +12,27 @@ struct EmptySpace {
 struct Wall {
 };
 
+using Cell = std::variant<EmptySpace, Wall, CreatureA>;
 
-template <std::size_t width, std::size_t height>
 class WorldMap
 {
 public:
+    WorldMap() = delete;
+    WorldMap(size_t width, size_t height);
+    size_t width() const {return m_width; }
+    size_t height() const {return m_height; }
+    size_t lenght() const { return m_width * m_height; }
+    void addWall(size_t ind);
+    void addCreature(CreatureA creature, size_t ind);
+    void moveObject(size_t from, size_t to);
+    std::optional<size_t> findFreeSpace(size_t ind);
 
-    size_t moveTo(size_t index, Direction dir) {
-
-        if (dir == Direction::Up)
-        {
-            if (index >= width) {
-                auto nInd = index - width;
-                if (std::holds_alternative<EmptySpace>(m_map.at(nInd))) {
-                    return nInd;
-                }
-            }
-            return index;
-        }
-    }
-
+    using WMap = std::vector<Cell>;
+    WMap m_map;
 private:
-    using wmap = std::array<std::variant<CreatureA, Wall, EmptySpace>, width * height>;
-    wmap m_map;
+    size_t m_width = 0;
+    size_t m_height = 0;
 };
+
+using WorldMapWeak = std::weak_ptr<WorldMap>;
+using WorldMapPtr = std::shared_ptr<WorldMap>;

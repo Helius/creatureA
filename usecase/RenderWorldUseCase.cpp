@@ -1,4 +1,5 @@
 #include "RenderWorldUseCase.h"
+#include <QDebug>
 
 namespace {
 
@@ -8,18 +9,32 @@ struct Overload : Ts ... {
 };
 template<class... Ts> Overload(Ts...) -> Overload<Ts...>;
 
-//auto TypeOfCell = Overload {
-//    [](Wall) { return RenderWorldUseCase::CellTypes::WallCell; },
-//    [](CreatureA) { return RenderWorldUseCase::CellTypes::CreatureCell; },
-//    [](auto) { return RenderWorldUseCase::CellTypes::EmptyCell; },
+//auto CellTypeToColor = Overload {
+//    [](const Wall &) { return QColor(0,0,0,0xff); },
+//    [](const CreatureA & c) {
+//        if (c.isAlive()) {
+//            return QColor(c.isPredatorIndex(), 255-c.isPredatorIndex(), 0x06, 0xff);
+//        }
+//        return QColor(128,128,128,100);
+//    },
+//    [](auto) { return QColor(0xff,0xff,0xff,0xff); },
 //  };
 
-auto CellToColor = Overload {
-    [](Wall) { return QColor(0,0,0,0xff); },
-    [](CreatureA) { return QColor(0x0b, 0x9A, 0x06, 0xff); },
+auto CellEnergyToColor = Overload {
+    [](const Wall &) { return QColor(0xff,0xff,0xff,0xff); },
+    [](const CreatureA & c) {
+        if (c.isAlive()) {
+            if (c.isPredatorIndex() > 2) {
+                return QColor(0x9a,0x0b,0x06,200);
+            }
+            return QColor(0x0b,0x9a,0x06,200);
+        }
+        return QColor(128,128,128,100);
+    },
     [](auto) { return QColor(0xff,0xff,0xff,0xff); },
   };
-}
+
+} // namespase
 
 RenderWorldUseCase::RenderWorldUseCase(WorldProcessorUnq processor, ICreatureBuilderPtr builder)
     : QObject()
@@ -28,22 +43,48 @@ RenderWorldUseCase::RenderWorldUseCase(WorldProcessorUnq processor, ICreatureBui
 {
     Q_ASSERT(m_processor);
     Q_ASSERT(m_builder);
-    m_builder->buildDefaultCreatures(100);
+
+    m_builder->buildDefaultCreatures(1);
+
+    connect(&m_timer, &QTimer::timeout, this, &RenderWorldUseCase::updateWorld);
+    connect(m_processor.get(), &WorldProcessor::ready, this, &RenderWorldUseCase::worldDataReady);
+    m_timer.setInterval(100);
+    m_timer.setSingleShot(false);
+    m_timer.start();
 }
 
 size_t RenderWorldUseCase::lenght() const
 {
-    return m_processor->map()->lenght();
-}
-
-const Cell &RenderWorldUseCase::get(size_t index) const
-{
-    return m_processor->map()->m_map.at(index);
+    return m_map.size();
 }
 
 QColor RenderWorldUseCase::getCellColor(size_t index) const
 {
-    Q_ASSERT(index < lenght());
-    const auto & cell = m_processor->map()->m_map.at(index);
-    return std::visit(CellToColor, cell);
+    if (index >= lenght()) {
+        return QColor();
+    }
+    const auto & cell = m_map.at(index);
+    return std::visit(CellEnergyToColor, cell);
+}
+
+//QColor RenderWorldUseCase::getBorderColor(size_t index) const
+//{
+//    if (index >= lenght()) {
+//        return QColor();
+//    }
+//    const auto & cell = m_map.at(index);
+//    return std::visit(CellTypeToColor, cell);
+//}
+
+void RenderWorldUseCase::updateWorld()
+{
+    m_processor->run(10);
+    m_elapsedTimer.start();
+}
+
+void RenderWorldUseCase::worldDataReady(const WorldMap::WMap & map)
+{
+    m_map = map;
+    qDebug() << "World process time: " << m_elapsedTimer.elapsed() << "ms";
+    emit redrawWorld();
 }
