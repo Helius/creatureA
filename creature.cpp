@@ -28,6 +28,8 @@ CreatureA CreatureA::clone()
         other.m_gene[rndIndex] = rndGene;
     }
 
+    other.m_direcrion.set(generator->generate());
+
     m_energy /= 2;
     other.m_energy = m_energy;
 
@@ -39,7 +41,7 @@ CreatureA CreatureA::clone()
 void CreatureA::process(size_t index)
 {
     bool finish = false;
-    int maxCount = 8;
+    int maxCount = 16;
     if (m_alive) {
         do {
             uint32_t pcNorm = pc % m_gene.size();
@@ -104,7 +106,7 @@ const std::map<uint, CreatureA::Command>CreatureA::m_commands = {
     // фотосинтез 1
     {25, [](CreatureA & c, size_t index)->bool {
          c.m_energy += c.m_sensor->sunAmounnt(index);
-         c.m_photonCount++;
+         ++c.m_photonCount;
          if (c.m_energy > m_devideEnegryThresold) {
              c.m_divider->divideMe(c, index);
          }
@@ -134,11 +136,8 @@ const std::map<uint, CreatureA::Command>CreatureA::m_commands = {
     },
     // атака
     {32, [](CreatureA & c, size_t index)->bool {
-         auto en = c.m_motion->attack(c.m_direcrion, index);
-         c.m_energy += en - 50;
-         if (en > 0) {
-             c.m_attackCount++;
-         }
+         c.m_energy += c.m_motion->attack(c.m_direcrion, index) - 50;
+         c.m_attackCount = 1;
          return true;
      }
     },

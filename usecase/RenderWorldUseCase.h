@@ -30,7 +30,7 @@ signals:
 
 private slots:
     void updateWorld();
-    void worldDataReady(const WorldMap::WMap &map);
+    void worldDataReady(WorldMap::WMap map);
 private:
     WorldProcessorUnq m_processor;
     ICreatureBuilderPtr m_builder;

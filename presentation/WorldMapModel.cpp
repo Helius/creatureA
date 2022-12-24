@@ -51,7 +51,7 @@ void WorldMapModel::update()
     } else {
         QElapsedTimer timer;
         timer.start();
-        emit dataChanged(index(0), index(rowCount({})-1));
+        emit dataChanged(index(0), index(rowCount({})-1), {Roles::MainColor});
         qDebug() << "Update model time:" << timer.elapsed() << "ms";
     }
 }

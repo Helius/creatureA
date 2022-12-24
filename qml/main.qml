@@ -14,8 +14,8 @@ Window {
         sourceComponent: GridView {
             property WorldMapModel $worldModel
             model: $worldModel
-            width: 256*4
-            height: 128*4
+            width: 450*4
+            height: 200*4
             cellWidth: 4
             cellHeight: 4
 

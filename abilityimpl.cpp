@@ -42,11 +42,15 @@ uint8_t SensorImpl::whoIsThereOffset(Direction dir, size_t index, const Creature
 uint SensorImpl::sunAmounnt(size_t index)
 {
     if (auto map = m_mapWeak.lock()) {
-        return map->height() / (50*(index/map->width() + 1));
-    } else {
-        qWarning() << "map is empty";
+        if (index > map->lenght()/2) {
+            return 2;
+        }
     }
-    return 0;
+//        return map->height() / (50*(index/map->width() + 1));
+//    } else {
+//        qWarning() << "map is empty";
+//    }
+    return 10;
 }
 
 

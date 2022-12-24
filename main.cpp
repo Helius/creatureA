@@ -25,7 +25,7 @@ int main(int argc, char *argv[])
 {
 
     const auto injector = di::make_injector(
-        di::bind<WorldMap>.to(std::make_shared<WorldMap>(256, 128)),
+        di::bind<WorldMap>.to(std::make_shared<WorldMap>(450, 200)),
         di::bind<WorldProcessor>.to<WorldProcessor>(),
         di::bind<ISensor>.to<SensorImpl>(),
         di::bind<IMotion>.to<MotionImpl>(),

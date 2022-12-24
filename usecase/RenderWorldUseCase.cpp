@@ -24,10 +24,11 @@ auto CellEnergyToColor = Overload {
     [](const Wall &) { return QColor(0xff,0xff,0xff,0xff); },
     [](const CreatureA & c) {
         if (c.isAlive()) {
-            if (c.isPredatorIndex() > 2) {
+            if (c.isPredatorIndex() > 0) {
                 return QColor(0x9a,0x0b,0x06,200);
+            } else {
+                return QColor(0x0b,0x9a,0x06,200);
             }
-            return QColor(0x0b,0x9a,0x06,200);
         }
         return QColor(128,128,128,100);
     },
@@ -44,7 +45,7 @@ RenderWorldUseCase::RenderWorldUseCase(WorldProcessorUnq processor, ICreatureBui
     Q_ASSERT(m_processor);
     Q_ASSERT(m_builder);
 
-    m_builder->buildDefaultCreatures(1);
+    m_builder->buildDefaultCreatures(10);
 
     connect(&m_timer, &QTimer::timeout, this, &RenderWorldUseCase::updateWorld);
     connect(m_processor.get(), &WorldProcessor::ready, this, &RenderWorldUseCase::worldDataReady);
@@ -60,11 +61,17 @@ size_t RenderWorldUseCase::lenght() const
 
 QColor RenderWorldUseCase::getCellColor(size_t index) const
 {
-    if (index >= lenght()) {
+    if (index >= m_map.size()) {
         return QColor();
     }
     const auto & cell = m_map.at(index);
-    return std::visit(CellEnergyToColor, cell);
+    try {
+        return std::visit(CellEnergyToColor, cell);
+    } catch (std::exception e) {
+        qWarning() << "something wrong accessing variant: " << e.what();
+
+    }
+    return QColor();
 }
 
 //QColor RenderWorldUseCase::getBorderColor(size_t index) const
@@ -78,13 +85,13 @@ QColor RenderWorldUseCase::getCellColor(size_t index) const
 
 void RenderWorldUseCase::updateWorld()
 {
-    m_processor->run(10);
+    m_processor->run(1);
     m_elapsedTimer.start();
 }
 
-void RenderWorldUseCase::worldDataReady(const WorldMap::WMap & map)
+void RenderWorldUseCase::worldDataReady(WorldMap::WMap map)
 {
-    m_map = map;
+    m_map = std::move(map);
     qDebug() << "World process time: " << m_elapsedTimer.elapsed() << "ms";
     emit redrawWorld();
 }

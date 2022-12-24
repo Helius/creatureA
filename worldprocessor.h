@@ -39,8 +39,9 @@ public:
     void addWalls(std::set<size_t> indexes);
     void addCreatures();
     const WorldMap::WMap & map() const {return m_map->m_map; };
+    void adjustSun(uint maxValue);
 signals:
-    void ready(const WorldMap::WMap & map);
+    void ready(WorldMap::WMap map);
     void runWorker(WorldMapPtr world, size_t cycles);
 private slots:
     void workerReady(WorldInfo info);
