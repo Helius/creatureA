@@ -43,21 +43,33 @@ uint SensorImpl::sunAmounnt(size_t index)
 {
     if (auto map = m_mapWeak.lock()) {
         if (index > map->lenght()/2) {
-            return 2;
+            return map->getSunLevel()/2;
         }
+        return map->getSunLevel();
     }
-//        return map->height() / (50*(index/map->width() + 1));
-//    } else {
-//        qWarning() << "map is empty";
-//    }
-    return 10;
+    return 0;
+}
+
+uint SensorImpl::myLevel(size_t index)
+{
+    if (auto map = m_mapWeak.lock()) {
+        return (4*index/map->width())/map->height();
+    }
+    return 0;
+}
+
+bool SensorImpl::lookAround(size_t index)
+{
+    if (auto map = m_mapWeak.lock()) {
+        return !!map->findFreeSpace(index);
+    }
+    return false;
 }
 
 
 MotionImpl::MotionImpl(WorldMapWeak wmap)
     : m_mapWeak(wmap)
 {
-
 }
 
 void MotionImpl::moveTo(Direction dir, size_t index)

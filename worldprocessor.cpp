@@ -10,7 +10,10 @@ WorldProcessor::WorldProcessor(WorldMapPtr worldMap)
     connect(this, &WorldProcessor::runWorker, m_worker, &Worker::runWorker);
     connect(m_worker, &Worker::jobsDone, this, &WorldProcessor::workerReady);
     m_workerThread.start();
-    qDebug() << "world processor, wmap:" << m_map.get();
+    connect(&m_timer, &QTimer::timeout, this, [this](){ run(m_cycles); });
+    m_timer.setInterval(300);
+    m_timer.setSingleShot(false);
+    m_timer.start();
 }
 
 WorldProcessor::~WorldProcessor()
@@ -22,8 +25,7 @@ WorldProcessor::~WorldProcessor()
 void WorldProcessor::run(size_t cycles)
 {
     m_runCount += cycles;
-    emit runWorker(m_map, cycles);
-
+    emit runWorker(m_map, cycles, m_sunLevel);
 }
 
 void WorldProcessor::addWalls(std::set<size_t> indexes)
@@ -38,12 +40,47 @@ void WorldProcessor::addCreatures()
 
 }
 
+
+void WorldProcessor::setSunLevel(uint maxValue)
+{
+    m_sunLevel = maxValue;
+}
+
+uint WorldProcessor::getSunLevel()
+{
+    return m_sunLevel;
+}
+
+void WorldProcessor::setPause(bool pause)
+{
+    if (pause) {
+        m_timer.stop();
+    } else {
+        m_timer.start();
+    }
+}
+
+bool WorldProcessor::isPaused() const
+{
+    return m_timer.isActive();
+}
+
 void WorldProcessor::workerReady(WorldInfo info)
 {
     qDebug() << "creatures: alive/dead" << info.aliveCreatures << "/" << info.deadCreatures
              << ", energy max/total" << info.maxEnergyPerCreature << "/" << info.totalEnegry
              << ", max child" << info.maxChildCount;
     emit ready(m_map->m_map);
+}
+
+uint WorldProcessor::cycles() const
+{
+    return m_cycles;
+}
+
+void WorldProcessor::setCycles(uint newCycles)
+{
+    m_cycles = newCycles;
 }
 
 //==============================
@@ -54,9 +91,11 @@ Worker::Worker(QObject *parent)
 
 }
 
-void Worker::runWorker(WorldMapPtr map, size_t cycles)
+void Worker::runWorker(WorldMapPtr map, size_t cycles, uint sunLevel)
 {
     WorldInfo info;
+
+    map->setSunLevel(sunLevel);
 
     for (size_t i = 0; i < cycles; ++i) {
         size_t index = 0;

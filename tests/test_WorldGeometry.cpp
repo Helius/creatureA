@@ -11,6 +11,8 @@ private slots:
     void TestGeometryIndexOutOfRange();
     void TestGeometryStartInd();
     void TestGeometryCengerInd();
+    void TestGeometryEnd();
+    void TestGeometryBottom();
 };
 
 
@@ -127,6 +129,55 @@ void TestWorldGeometry::TestGeometryCengerInd()
     QCOMPARE(*ns.go(dir), 259);
     dir.turnRight(); // left + up
     QCOMPARE(*ns.go(dir), 3);
+}
+
+void TestWorldGeometry::TestGeometryEnd()
+{
+    // 0,1,2, 3
+    // 4,5,6, 7
+    // 8,9,10,11
+    Direction dir;
+    NearestSpace ns(11,4,3);
+    QCOMPARE(*ns.go(dir), 7);
+    dir.turnRight(); // up+right
+    QCOMPARE(!!ns.go(dir), false);
+    dir.turnRight(); // right
+    QCOMPARE(!!ns.go(dir), false);
+    dir.turnRight(); // right + down
+    QCOMPARE(!!ns.go(dir), false);
+    dir.turnRight(); // down
+    QCOMPARE(!!ns.go(dir), false);
+    dir.turnRight(); // down + left
+    QCOMPARE(!!ns.go(dir), false);
+    dir.turnRight(); // left
+    QCOMPARE(*ns.go(dir), 10);
+    dir.turnRight(); // left + up
+    QCOMPARE(*ns.go(dir), 6);
+
+}
+
+void TestWorldGeometry::TestGeometryBottom()
+{
+    // 0,1,2, 3
+    // 4,5,6, 7
+    // 8,9,10,11
+    Direction dir;
+    NearestSpace ns(10,4,3);
+    QCOMPARE(*ns.go(dir), 6);
+    dir.turnRight(); // up+right
+    QCOMPARE(ns.go(dir), 7);
+    dir.turnRight(); // right
+    QCOMPARE(ns.go(dir), 11);
+    dir.turnRight(); // right + down
+    QCOMPARE(!!ns.go(dir), false);
+    dir.turnRight(); // down
+    QCOMPARE(!!ns.go(dir), false);
+    dir.turnRight(); // down + left
+    QCOMPARE(!!ns.go(dir), false);
+    dir.turnRight(); // left
+    QCOMPARE(*ns.go(dir), 9);
+    dir.turnRight(); // left + up
+    QCOMPARE(*ns.go(dir), 5);
 }
 
 QTEST_MAIN(TestWorldGeometry)

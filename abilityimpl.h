@@ -10,6 +10,8 @@ public:
 public:
     uint8_t whoIsThereOffset(Direction dir, size_t index, const CreatureA & me) override;
     uint sunAmounnt(size_t index) override;
+    uint myLevel(size_t index) override;
+    bool lookAround(size_t index) override;
 private:
     WorldMapWeak m_mapWeak;
 };

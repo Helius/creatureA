@@ -16,6 +16,7 @@
 #include "abilityimpl.h"
 #include "worldprocessor.h"
 #include "CreatureBuilderImpl.h"
+#include "presentation/WorldControllerPresenter.h"
 #include "ICreatureBuilder.h"
 
 
@@ -31,12 +32,16 @@ int main(int argc, char *argv[])
         di::bind<IMotion>.to<MotionImpl>(),
         di::bind<IDivider>.to<CreatureCreatorImlp>(),
         di::bind<ICreatureBuilder>.to<CreatureBuilderImpl>(),
-        di::bind<WorldMapModel>.to<WorldMapModel>()
+        di::bind<WorldMapModel>.to<WorldMapModel>(),
+        di::bind<IWorldController>.to<WorldProcessor>()
         );
 
     QmlInjectorBuilder builder;
     builder.add<WorldMapModel>([&injector](const QVariant&) -> WorldMapModelUnq {
         return injector.create<WorldMapModelUnq>();
+    });
+    builder.add<WorldControllerPresenter>([&injector](const QVariant&) -> WorldControllerPresenterUnq {
+        return injector.create<WorldControllerPresenterUnq>();
     });
 
     qmlRegisterType<QmlInjector>("injector", 1, 0, "QmlInjector");

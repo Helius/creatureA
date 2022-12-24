@@ -4,7 +4,6 @@
 #include <worldprocessor.h>
 #include <QColor>
 #include <ICreatureBuilder.h>
-#include <QTimer>
 
 class RenderWorldUseCase : public QObject {
 
@@ -18,24 +17,20 @@ public:
     };
 
 public:
-    RenderWorldUseCase(WorldProcessorUnq processor, ICreatureBuilderPtr builder);
+    RenderWorldUseCase(WorldProcessorPtr processor, ICreatureBuilderPtr builder);
 
     size_t lenght() const;
     QColor getCellColor(size_t index) const;
-//    QColor getBorderColor(size_t index) const;
     const WorldMap::WMap & map() const;
 
 signals:
     void redrawWorld();
 
 private slots:
-    void updateWorld();
     void worldDataReady(WorldMap::WMap map);
 private:
-    WorldProcessorUnq m_processor;
+    WorldProcessorPtr m_processor;
     ICreatureBuilderPtr m_builder;
-    QTimer m_timer;
-    QElapsedTimer m_elapsedTimer;
     WorldMap::WMap m_map;
 };
 

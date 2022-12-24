@@ -11,7 +11,6 @@ qt_add_executable(appcreatureA
     main.cpp
     creature.cpp
     creature.h
-    Direction.h
     worldmap.cpp
     worldmap.h
     WorldGeometry.h
@@ -25,6 +24,7 @@ qt_add_executable(appcreatureA
     ICreatureBuilder.h
     CreatureBuilderImpl.h
     CreatureBuilderImpl.cpp
+    IWorldController.h
 
 
     lib/qmlinjector/iqmlobjectcreator.cpp
@@ -35,6 +35,8 @@ qt_add_executable(appcreatureA
 
     presentation/WorldMapModel.h
     presentation/WorldMapModel.cpp
+    presentation/WorldControllerPresenter.h
+    presentation/WorldControllerPresenter.cpp
 
     usecase/RenderWorldUseCase.h
     usecase/RenderWorldUseCase.cpp

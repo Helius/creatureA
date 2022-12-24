@@ -26,12 +26,15 @@ public:
     void addCreature(CreatureA creature, size_t ind);
     void moveObject(size_t from, size_t to);
     std::optional<size_t> findFreeSpace(size_t ind);
+    void setSunLevel(uint sunLevel);
+    uint getSunLevel() const;
 
     using WMap = std::vector<Cell>;
     WMap m_map;
 private:
     size_t m_width = 0;
     size_t m_height = 0;
+    uint m_sunLevel = 10;
 };
 
 using WorldMapWeak = std::weak_ptr<WorldMap>;

@@ -19,7 +19,7 @@ void WorldMap::addWall(size_t ind) {
 void WorldMap::addCreature(CreatureA creature, size_t ind)
 {
     Q_ASSERT(ind < m_width * m_height);
-    m_map[ind] = {creature};
+    m_map[ind] = { creature };
 
 }
 
@@ -40,13 +40,21 @@ std::optional<size_t> WorldMap::findFreeSpace(size_t ind)
     NearestSpace ns(ind, m_width, m_height);
     for (uint i = 0; i < Direction::maxNumber; ++i) {
         if (auto newInd = ns.go(dir)) {
-            if (std::holds_alternative<EmptySpace>(m_map.at(*newInd))
-                //|| (std::holds_alternative<CreatureA>(m_map.at(*newInd)) && !std::get<CreatureA>(m_map.at(*newInd)).isAlive())
-                ) {
+            if (std::holds_alternative<EmptySpace>(m_map.at(*newInd))) {
                 return newInd;
             }
         }
         dir.turnRight();
     }
     return {};
+}
+
+void WorldMap::setSunLevel(uint sunLevel)
+{
+    m_sunLevel = sunLevel;
+}
+
+uint WorldMap::getSunLevel() const
+{
+    return m_sunLevel;
 }

@@ -4,7 +4,6 @@
 #include <functional>
 #include <map>
 #include "Abilities.h"
-#include "Direction.h"
 
 class CreatureA
 {
@@ -22,14 +21,14 @@ public:
 
 private:
     std::array<uint8_t, 64> m_gene = {25};
-    int32_t m_energy = 1000;
+    int32_t m_energy = 500;
     uint32_t age = 0;
     uint32_t m_childCount = 0;
     uint32_t m_attackCount = 0;
     uint32_t m_photonCount = 0;
     uint pc = 0; // programm counter
     Direction m_direcrion;
-    static constexpr int32_t m_devideEnegryThresold = 1000;
+    static constexpr int32_t m_devideEnegryThresold = 500;
     ISensorPtr m_sensor;
     IMotionPtr m_motion;
     IDividerPtr m_divider;

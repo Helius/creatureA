@@ -1,9 +1,14 @@
 #pragma once
 
 #include "worldmap.h"
+
+#include <set>
+
 #include <QObject>
 #include <QThread>
-#include <set>
+#include <QTimer>
+
+#include <IWorldController.h>
 
 
 struct WorldInfo {
@@ -21,7 +26,7 @@ class Worker : public QObject
 public:
     Worker(QObject * parent);
 public slots:
-    void runWorker(WorldMapPtr map, size_t cycles);
+    void runWorker(WorldMapPtr map, size_t cycles, uint sunLevel);
 signals:
     void jobsDone(WorldInfo info);
 private:
@@ -29,9 +34,12 @@ private:
 
 
 
-class WorldProcessor : public QObject
+class WorldProcessor
+    : public QObject
+    , public IWorldController
 {
     Q_OBJECT
+
 public:
     WorldProcessor(WorldMapPtr);
     ~WorldProcessor();
@@ -39,17 +47,32 @@ public:
     void addWalls(std::set<size_t> indexes);
     void addCreatures();
     const WorldMap::WMap & map() const {return m_map->m_map; };
-    void adjustSun(uint maxValue);
+
+    // IWorldController interface
+public:
+    void setSunLevel(uint maxValue) override;
+    uint getSunLevel() override;
+    void setPause(bool pause) override;
+    bool isPaused() const override;
+
+    uint cycles() const;
+    void setCycles(uint newCycles);
+
 signals:
     void ready(WorldMap::WMap map);
-    void runWorker(WorldMapPtr world, size_t cycles);
+    void runWorker(WorldMapPtr world, size_t cycles, uint sunLevel);
 private slots:
     void workerReady(WorldInfo info);
 private:
-    size_t m_runCount = 0;
+    uint m_runCount = 0;
+    uint m_cycles = 1;
+    uint m_sunLevel = 10;
     WorldMapPtr m_map;
     Worker * m_worker;
     QThread m_workerThread;
+    QTimer m_timer;
+    QElapsedTimer m_elapsedTimer;
+
 };
 
-using WorldProcessorUnq = std::unique_ptr<WorldProcessor>;
+using WorldProcessorPtr = std::shared_ptr<WorldProcessor>;
