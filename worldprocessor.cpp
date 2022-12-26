@@ -13,7 +13,7 @@ WorldProcessor::WorldProcessor(WorldMapPtr worldMap)
     m_workerThread.start();
     connect(&m_timer, &QTimer::timeout, this, [this]() {
         if (!m_inProgress) {
-            run(m_cycles);
+            run(m_worldSpeed);
         }
     });
     m_timer.setInterval(100);
@@ -31,7 +31,7 @@ void WorldProcessor::run(size_t cycles)
 {
     m_inProgress = true;
     m_runCount += cycles;
-    emit runWorker(m_map, cycles, m_sunLevel);
+    emit runWorker(m_map, cycles, m_sunLevel, m_maxCreatureEnergy, m_mutationRate, m_moveEnergy, m_divideEnergy);
 }
 
 //void WorldProcessor::addWalls(std::set<size_t> indexes)
@@ -50,14 +50,9 @@ void WorldProcessor::addCreatures(size_t amount)
 }
 
 
-void WorldProcessor::setSunLevel(uint maxValue)
+void WorldProcessor::setSunLevel(int maxValue)
 {
     m_sunLevel = maxValue;
-}
-
-uint WorldProcessor::getSunLevel()
-{
-    return m_sunLevel;
 }
 
 void WorldProcessor::setPause(bool pause)
@@ -74,6 +69,41 @@ bool WorldProcessor::isPaused() const
     return m_timer.isActive();
 }
 
+void WorldProcessor::setMaxCreatureEnergy(int e)
+{
+    m_maxCreatureEnergy = e;
+}
+
+void WorldProcessor::setMutationRate(uint e)
+{
+    m_mutationRate = e;
+}
+
+void WorldProcessor::setMoveEnergy(int e)
+{
+    m_moveEnergy = e;
+}
+
+void WorldProcessor::setDivideEnergy(int e)
+{
+    m_divideEnergy = e;
+}
+
+void WorldProcessor::setWorldSpeed(uint s)
+{
+    m_worldSpeed = s;
+}
+
+uint WorldProcessor::getMaxCreatureEnergy() const
+{
+    return m_maxCreatureEnergy;
+}
+
+void WorldProcessor::restart()
+{
+    emit resetWorker(m_map, m_sunLevel, m_maxCreatureEnergy, m_mutationRate, m_moveEnergy, m_divideEnergy);
+}
+
 void WorldProcessor::workerReady(WorldInfo info)
 {
     qDebug() << "creatures: alive/dead" << info.aliveCreatures << "/" << info.deadCreatures
@@ -84,14 +114,14 @@ void WorldProcessor::workerReady(WorldInfo info)
     m_inProgress = false;
 }
 
-uint WorldProcessor::cycles() const
+void WorldProcessor::setShowMode(ShowMode mode)
 {
-    return m_cycles;
+    m_showMode = mode;
 }
 
-void WorldProcessor::setCycles(uint newCycles)
+IWorldController::ShowMode WorldProcessor::showMode() const
 {
-    m_cycles = newCycles;
+    return m_showMode;
 }
 
 //==============================
@@ -102,11 +132,15 @@ Worker::Worker(QObject *parent)
 
 }
 
-void Worker::runWorker(WorldMapPtr map, size_t cycles, uint sunLevel)
+void Worker::runWorker(WorldMapPtr map, size_t cycles, uint sunLevel, uint maxEnergy, uint mutationRate, uint moveEnergy, uint minDivideEnergy)
 {
     WorldInfo info;
 
     map->setSunLevel(sunLevel);
+    map->setMaxCreatureEnergy(maxEnergy);
+    map->setMutationRate(mutationRate);
+    map->setMoveEnegrgy(moveEnergy);
+    map->setMinDivideEnergy(minDivideEnergy);
 
     for (size_t i = 0; i < cycles; ++i) {
         size_t index = 0;
@@ -146,4 +180,22 @@ void Worker::runWorker(WorldMapPtr map, size_t cycles, uint sunLevel)
         }
     }
     emit jobsDone(info);
+}
+
+void Worker::resetWorker(WorldMapPtr map, uint sunLevel, uint maxEnergy, uint mutationRate, uint moveEnergy, uint minDivideEnergy)
+{
+    map->setSunLevel(sunLevel);
+    map->setMaxCreatureEnergy(maxEnergy);
+    map->setMutationRate(mutationRate);
+    map->setMoveEnegrgy(moveEnergy);
+    map->setMinDivideEnergy(minDivideEnergy);
+
+    for (auto & v : map->m_map) {
+        v = {EmptySpace()};
+    }
+    int amount = 10;
+    while(amount--) {
+        CreatureA c(*map);
+        map->addCreature(c, QRandomGenerator::global()->generate()%map->width());
+    }
 }

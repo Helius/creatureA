@@ -35,15 +35,18 @@ Window {
             implicitWidth: view.width
             implicitHeight: view.height
             sourceComponent: Column {
+                spacing: 10
                 property WorldControllerPresenter $presenter
-                Text {
-                    text: slider.value
-                }
                 Row {
                     spacing: 10
-                    Slider {
+                    TextSlider {
                         id: slider
                         property bool upd: true
+                        text: "Sun energy"
+                        min: 0
+                        step: 1
+                        value: $presenter.sunLevel
+                        max: 100
 
                         Timer {
                             id: waitTimer
@@ -81,10 +84,6 @@ Window {
                             }
                         }
 
-                        from: 0
-                        stepSize: 1
-                        value: $presenter.sunLevel
-                        to: 100
                         onValueChanged: {
                             console.log("helius: setSunLevel", value)
                             $presenter.setSunLevel(value);
@@ -100,6 +99,66 @@ Window {
                                 tickTimer.start();
                             }
                         }
+                    }
+                }
+                TextSlider {
+                    text: "Move energy"
+                    min: 0
+                    max: 500
+                    step: 1
+                    value: $presenter.moveEnergy
+                    onValueChanged: {
+                        $presenter.moveEnergy = value;
+                    }
+                }
+                TextSlider {
+                    text: "Mutation rate"
+                    min: 0
+                    max: 100
+                    step: 10
+                    value: $presenter.mutationRate
+                    onValueChanged: {
+                        $presenter.mutationRate = value;
+                    }
+                }
+                TextSlider {
+                    text: "Divide energy"
+                    min: 0
+                    max: 2000
+                    step: 1
+                    value: $presenter.divideEnergy
+                    onValueChanged: {
+                        $presenter.divideEnergy = value;
+                    }
+                }
+                TextSlider {
+                    text: "Max energy"
+                    min: 0
+                    max: 2000
+                    step: 100
+                    value: $presenter.maxEnergy
+                    onValueChanged: {
+                        $presenter.maxEnergy = value;
+                    }
+                }
+                TextSlider {
+                    text: "World speed: " + Math.pow(10, value)
+                    min: 0
+                    max: 2
+                    step: 1
+                    value: 0
+                    onValueChanged: {
+                        $presenter.worldSpeed = Math.pow(10, value);
+                    }
+                }
+                TextSlider {
+                    text: "Show mode"
+                    min: 0
+                    max: 2
+                    step: 1
+                    value: 0
+                    onValueChanged: {
+                        $presenter.showMode = value;
                     }
                 }
             }

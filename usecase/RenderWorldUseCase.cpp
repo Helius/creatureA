@@ -9,21 +9,6 @@ struct Overload : Ts ... {
 };
 template<class... Ts> Overload(Ts...) -> Overload<Ts...>;
 
-auto CellEnergyToColor = Overload {
-    [](const Wall &) { return QColor(0xff,0xff,0xff,0xff); },
-    [](const CreatureA & c) {
-        if (c.isAlive()) {
-            if (c.isPredatorIndex() > 0) {
-                return QColor(0x9a,0x0b,0x06,200);
-            } else {
-                return QColor(0x0b,0x9a,0x06,200);
-            }
-//            return QColor(0xff,0,0,(c.getEnergy()*255)/1000);
-        }
-        return QColor(128,128,128,100);
-    },
-    [](auto) { return QColor(0xff,0xff,0xff,0xff); },
-  };
 
 } // namespase
 
@@ -44,13 +29,27 @@ size_t RenderWorldUseCase::lenght() const
 
 QColor RenderWorldUseCase::getCellColor(size_t index) const
 {
+    auto CellEnergyToColor = Overload {
+        [](const Wall &) { return QColor(0xff,0xff,0xff,0xff); },
+        [this](const CreatureA & c) {
+            return QColor(0xff,0,0,(c.getEnergy()*255)/m_processor->getMaxCreatureEnergy());
+        },
+        [](auto) { return QColor(0xff,0xff,0xff,0xff); },
+        };
+
     if (index >= m_map.size()) {
         return QColor();
     }
     const auto & cell = m_map.at(index);
     try {
-        //return std::visit(CellEnergyToColor, cell);
-        return cellToColor(cell);
+        switch (m_processor->showMode()) {
+        case WorldProcessor::ShowMode::ShowPredators:
+            return cellToColor(cell);
+        case WorldProcessor::ShowMode::ShowEnergy:
+            return std::visit(CellEnergyToColor, cell);
+        case WorldProcessor::ShowMode::ShowDivercity:
+            return QColor(0, 0, 0xff);
+        }
     } catch (std::exception e) {
         qWarning() << "something wrong accessing variant: " << e.what();
         return QColor(0,0,0);
@@ -69,10 +68,11 @@ void RenderWorldUseCase::worldDataReady(WorldMap::WMap map, WorldInfo info)
 QColor RenderWorldUseCase::cellToColor(const Cell &c) const
 {
     if (std::holds_alternative<CreatureA>(c)) {
-        auto creature = std::get<CreatureA>(c);
+        const CreatureA & creature = std::get<CreatureA>(c);
         if (creature.isAlive()) {
+         //   qDebug() << " ====== creature attack/photone:" << creature.attackCount() << creature.photoneCount();
             return (creature.attackCount() > creature.photoneCount())
-                ? QColor(200,10,10,200)
+                ? QColor(200,30,10,200)
                 : QColor(30,180,10,200);
         } else {
             return QColor(128,128,128,100);

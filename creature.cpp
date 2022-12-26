@@ -1,5 +1,6 @@
 #include "creature.h"
 #include <QRandomGenerator>
+#include <QDebug>
 
 
 CreatureA::CreatureA(IWorldEnv & wenv)
@@ -35,6 +36,8 @@ CreatureA CreatureA::clone()
 
     m_energy /= 2;
     other.m_energy = m_energy;
+    other.m_attackCount = m_attackCount;
+    other.m_photonCount = m_photonCount;
 
     m_childCount++;
 
@@ -70,17 +73,12 @@ bool CreatureA::similarTo(const CreatureA &c) const
     return true;
 }
 
-uint CreatureA::isPredatorIndex() const
+int CreatureA::attackCount() const
 {
     return m_attackCount;
 }
 
-uint CreatureA::attackCount() const
-{
-    return m_attackCount;
-}
-
-uint CreatureA::photoneCount() const
+int CreatureA::photoneCount() const
 {
     return m_photonCount;
 }
@@ -126,25 +124,17 @@ void CreatureA::process(size_t index)
 }
 
 const std::map<uint, CreatureA::Command>CreatureA::m_commands = {
-    // фотосинтез 1
-    {25, [](CreatureA & c, size_t index)->bool {
-         auto e = c.m_wenv->sunAmounnt(index);
-         c.m_energy += e;
-         if (c.m_energy > static_cast<int>(c.m_wenv->maxCreatureEnergy())) {
-             c.m_energy = c.m_wenv->maxCreatureEnergy();
-         }
-         c.m_photonCount += e;
+    // поcворот 1
+    {1, [](CreatureA & c, size_t )->bool {
+         c.m_direcrion.turnLeft();
+         c.m_energy -= c.m_wenv->moveEnergy();
          return true;
      }
     },
-    // поcворот 1
-    {1, [](CreatureA & c, size_t )->bool {
-         if (QRandomGenerator::global()->generate() %2 == 0) {
-             c.m_direcrion.turnLeft();
-         } else {
-             c.m_direcrion.turnRight();
-         }
-         c.m_energy -= 1;
+    // поcворот 2
+    {5, [](CreatureA & c, size_t )->bool {
+         c.m_direcrion.turnRight();
+         c.m_energy -= c.m_wenv->moveEnergy();
          return true;
      }
     },
@@ -162,11 +152,27 @@ const std::map<uint, CreatureA::Command>CreatureA::m_commands = {
          return true;
      }
     },
+    // фотосинтез 1
+    {25, [](CreatureA & c, size_t index)->bool {
+         auto e = c.m_wenv->sunAmounnt(index);
+         c.m_energy += e;
+         c.m_photonCount += e;
+         if (c.m_energy > static_cast<int>(c.m_wenv->maxCreatureEnergy())) {
+//             c.m_energy = c.m_wenv->maxCreatureEnergy();
+             c.m_wenv->divideMe(c, index);
+         }
+         return true;
+     }
+    },
     // атака
     {32, [](CreatureA & c, size_t index)->bool {
-         auto e = c.m_wenv->attack(c.m_direcrion, index) - c.m_wenv->moveEnergy();
-         c.m_energy += e;
+         int e = c.m_wenv->attack(c.m_direcrion, index);
+         c.m_energy += e - c.m_wenv->moveEnergy();
          c.m_attackCount += e;
+         if (c.m_energy > static_cast<int>(c.m_wenv->maxCreatureEnergy())) {
+//             c.m_energy = c.m_wenv->maxCreatureEnergy();
+             c.m_wenv->divideMe(c, index);
+         }
          return true;
      }
     },

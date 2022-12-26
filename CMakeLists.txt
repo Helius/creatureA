@@ -41,7 +41,7 @@ set_property(TARGET appcreatureA PROPERTY CXX_STANDARD 17)
 qt_add_qml_module(appcreatureA
     URI creatureA
     VERSION 1.0
-    QML_FILES qml/main.qml
+    QML_FILES qml/main.qml qml/TextSlider.qml
 )
 
 set_target_properties(appcreatureA PROPERTIES

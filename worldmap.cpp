@@ -55,27 +55,27 @@ std::optional<size_t> WorldMap::findFreeSpace(size_t ind)
     return {};
 }
 
-void WorldMap::setSunLevel(uint sunLevel)
+void WorldMap::setSunLevel(int sunLevel)
 {
     m_sunLevel = sunLevel;
 }
 
-uint WorldMap::getSunLevel() const
+int WorldMap::getSunLevel() const
 {
     return m_sunLevel;
 }
 
-void WorldMap::setMinDivideEnergy(uint newMinDivideEnergy)
+void WorldMap::setMinDivideEnergy(int newMinDivideEnergy)
 {
     m_minDivideEnergy = newMinDivideEnergy;
 }
 
-void WorldMap::setMoveEnegrgy(uint newMoveEnegrgy)
+void WorldMap::setMoveEnegrgy(int newMoveEnegrgy)
 {
     m_moveEnegrgy = newMoveEnegrgy;
 }
 
-void WorldMap::setMaxCreatureEnergy(uint newMaxCreatureEnergy)
+void WorldMap::setMaxCreatureEnergy(int newMaxCreatureEnergy)
 {
     m_maxCreatureEnergy = newMaxCreatureEnergy;
 }
@@ -106,7 +106,7 @@ uint8_t WorldMap::whoIsThereOffset(Direction dir, size_t index, const CreatureA 
     return 3; // wall
 }
 
-uint WorldMap::sunAmounnt(size_t index)
+int WorldMap::sunAmounnt(size_t index)
 {
     return (m_sunLevel*(m_height - index/m_width))/m_height;
 }
@@ -160,17 +160,17 @@ uint WorldMap::mutationRate() const
     return m_mutationRate;
 }
 
-uint WorldMap::maxCreatureEnergy() const
+int WorldMap::maxCreatureEnergy() const
 {
     return m_maxCreatureEnergy;
 }
 
-uint WorldMap::moveEnergy() const
+int WorldMap::moveEnergy() const
 {
     return m_moveEnegrgy;
 }
 
-uint WorldMap::minDivideEnergy() const
+int WorldMap::minDivideEnergy() const
 {
     return m_minDivideEnergy;
 }
