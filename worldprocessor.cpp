@@ -1,4 +1,5 @@
 #include "worldprocessor.h"
+#include <QRandomGenerator>
 #include <QDebug>
 
 WorldProcessor::WorldProcessor(WorldMapPtr worldMap)
@@ -40,9 +41,12 @@ void WorldProcessor::run(size_t cycles)
 //    }
 //}
 
-void WorldProcessor::addCreatures()
+void WorldProcessor::addCreatures(size_t amount)
 {
-
+    while(amount--) {
+        CreatureA c(*m_map);
+        m_map->addCreature(c, QRandomGenerator::global()->generate()%m_map->width());
+    }
 }
 
 

@@ -3,6 +3,12 @@
 #include <QRandomGenerator>
 #include <QDebug>
 
+template<typename ... Ts>
+struct Overload : Ts ... {
+    using Ts::operator() ...;
+};
+template<class... Ts> Overload(Ts...) -> Overload<Ts...>;
+
 WorldMap::WorldMap(size_t width, size_t height)
     : m_width(width)
     , m_height(height)
@@ -57,4 +63,114 @@ void WorldMap::setSunLevel(uint sunLevel)
 uint WorldMap::getSunLevel() const
 {
     return m_sunLevel;
+}
+
+void WorldMap::setMinDivideEnergy(uint newMinDivideEnergy)
+{
+    m_minDivideEnergy = newMinDivideEnergy;
+}
+
+void WorldMap::setMoveEnegrgy(uint newMoveEnegrgy)
+{
+    m_moveEnegrgy = newMoveEnegrgy;
+}
+
+void WorldMap::setMaxCreatureEnergy(uint newMaxCreatureEnergy)
+{
+    m_maxCreatureEnergy = newMaxCreatureEnergy;
+}
+
+void WorldMap::setMutationRate(uint newMutationRate)
+{
+    m_mutationRate = newMutationRate;
+}
+
+uint8_t WorldMap::whoIsThereOffset(Direction dir, size_t index, const CreatureA &me)
+{
+    auto CellToType = Overload {
+        [](const Wall &) { return 3; },
+        [&me](const CreatureA & c) {
+            if (c.isAlive()) {
+                if (me.similarTo(c)) {
+                    return 1;
+                }
+            }
+            return 2;
+        },
+        [](auto) { return 0; },
+        };
+    NearestSpace ns(index, m_width, m_height);
+    if (auto iopt = ns.go(dir)) {
+        return std::visit(CellToType, m_map.at(*iopt));
+    }
+    return 3; // wall
+}
+
+uint WorldMap::sunAmounnt(size_t index)
+{
+    return (m_sunLevel*(m_height - index/m_width))/m_height;
+}
+
+uint WorldMap::myLevel(size_t index)
+{
+    return (64 * index/m_width)/m_height;
+}
+
+bool WorldMap::lookAround(size_t index)
+{
+    return !!findFreeSpace(index);
+}
+
+void WorldMap::moveTo(Direction dir, size_t index)
+{
+    NearestSpace ns(index, m_width, m_height);
+    if (auto iopt = ns.go(dir)) {
+        if (std::holds_alternative<EmptySpace> (m_map.at(*iopt))) {
+            moveObject(index, *iopt);
+        }
+    }
+}
+
+int WorldMap::attack(Direction dir, size_t index)
+{
+    int energy = 0;
+    NearestSpace ns(index, m_width, m_height);
+    if (auto iopt = ns.go(dir)) {
+        if (std::holds_alternative<CreatureA>(m_map.at(*iopt))) {
+            auto c = std::get<CreatureA>(m_map.at(*iopt));
+            energy = c.getEnergy();
+            moveObject(index, *iopt);
+        }
+    }
+    return energy;
+
+}
+
+void WorldMap::divideMe(CreatureA &creature, size_t index)
+{
+    if (auto empty = findFreeSpace(index)) {
+        addCreature(creature.clone(), *empty);
+    } else {
+        creature.die();
+    }
+}
+
+uint WorldMap::mutationRate() const
+{
+    return m_mutationRate;
+}
+
+uint WorldMap::maxCreatureEnergy() const
+{
+    return m_maxCreatureEnergy;
+}
+
+uint WorldMap::moveEnergy() const
+{
+    return m_moveEnegrgy;
+}
+
+uint WorldMap::minDivideEnergy() const
+{
+    return m_minDivideEnergy;
 }

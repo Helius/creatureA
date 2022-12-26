@@ -12,12 +12,8 @@
 #include <presentation/WorldMapModel.h>
 
 #include "worldmap.h"
-#include "Abilities.h"
-#include "abilityimpl.h"
 #include "worldprocessor.h"
-#include "CreatureBuilderImpl.h"
 #include "presentation/WorldControllerPresenter.h"
-#include "ICreatureBuilder.h"
 
 
 namespace di = boost::di;
@@ -28,10 +24,6 @@ int main(int argc, char *argv[])
     const auto injector = di::make_injector(
         di::bind<WorldMap>.to(std::make_shared<WorldMap>(450, 200)),
         di::bind<WorldProcessor>.to<WorldProcessor>(),
-        di::bind<ISensor>.to<SensorImpl>(),
-        di::bind<IMotion>.to<MotionImpl>(),
-        di::bind<IDivider>.to<CreatureCreatorImlp>(),
-        di::bind<ICreatureBuilder>.to<CreatureBuilderImpl>(),
         di::bind<WorldMapModel>.to<WorldMapModel>(),
         di::bind<IWorldController>.to<WorldProcessor>()
         );

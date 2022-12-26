@@ -47,7 +47,7 @@ public:
     ~WorldProcessor();
     void run(size_t cycles);
 //    void addWalls(std::set<size_t> indexes);
-    void addCreatures();
+    void addCreatures(size_t amount);
     const WorldMap::WMap & map() const {return m_map->m_map; };
 
     // IWorldController interface

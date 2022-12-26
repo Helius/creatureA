@@ -3,7 +3,6 @@
 #include <QObject>
 #include <worldprocessor.h>
 #include <QColor>
-#include <ICreatureBuilder.h>
 
 class RenderWorldUseCase : public QObject {
 
@@ -17,7 +16,7 @@ public:
     };
 
 public:
-    RenderWorldUseCase(WorldProcessorPtr processor, ICreatureBuilderPtr builder);
+    RenderWorldUseCase(WorldProcessorPtr processor);
 
     size_t lenght() const;
     QColor getCellColor(size_t index) const;
@@ -34,7 +33,6 @@ private:
 
 private:
     WorldProcessorPtr m_processor;
-    ICreatureBuilderPtr m_builder;
     WorldMap::WMap m_map;
     WorldInfo m_info;
 };

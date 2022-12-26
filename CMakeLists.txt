@@ -16,14 +16,8 @@ qt_add_executable(appcreatureA
     WorldGeometry.h
     WorldGeometry.cpp
     lib/di.hpp
-    Abilities.h
-    abilityimpl.h
-    abilityimpl.cpp
     worldprocessor.h
     worldprocessor.cpp
-    ICreatureBuilder.h
-    CreatureBuilderImpl.h
-    CreatureBuilderImpl.cpp
     IWorldController.h
 
 

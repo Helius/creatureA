@@ -27,17 +27,14 @@ auto CellEnergyToColor = Overload {
 
 } // namespase
 
-RenderWorldUseCase::RenderWorldUseCase(WorldProcessorPtr processor, ICreatureBuilderPtr builder)
+RenderWorldUseCase::RenderWorldUseCase(WorldProcessorPtr processor)
     : QObject()
     , m_processor(processor)
-    , m_builder(builder)
 {
     Q_ASSERT(m_processor);
-    Q_ASSERT(m_builder);
-
-    m_builder->buildDefaultCreatures(10);
-
-    connect(m_processor.get(), &WorldProcessor::ready, this, &RenderWorldUseCase::worldDataReady);
+    connect(m_processor.get(), &WorldProcessor::ready,
+        this, &RenderWorldUseCase::worldDataReady);
+    m_processor->addCreatures(10);
 }
 
 size_t RenderWorldUseCase::lenght() const
