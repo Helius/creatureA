@@ -27,11 +27,16 @@ signals:
     void redrawWorld();
 
 private slots:
-    void worldDataReady(WorldMap::WMap map);
+    void worldDataReady(WorldMap::WMap map, WorldInfo info);
+
+private:
+    QColor cellToColor(const Cell & c) const;
+
 private:
     WorldProcessorPtr m_processor;
     ICreatureBuilderPtr m_builder;
     WorldMap::WMap m_map;
+    WorldInfo m_info;
 };
 
 

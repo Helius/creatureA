@@ -18,6 +18,10 @@ public:
     void die();
     bool similarTo(const CreatureA & c) const;
     uint isPredatorIndex() const;
+    uint attackCount() const;
+    uint photoneCount() const;
+    void markProcessed(bool);
+    bool isProcessed() const;
 
 private:
     std::array<uint8_t, 64> m_gene = {25};
@@ -37,6 +41,7 @@ private:
     static const std::map<uint, Command> m_commands;
 
     bool m_alive = true;
+    bool m_processed = false;
 
 };
 

@@ -22,7 +22,7 @@ public:
     size_t width() const {return m_width; }
     size_t height() const {return m_height; }
     size_t lenght() const { return m_width * m_height; }
-    void addWall(size_t ind);
+//    void addWall(size_t ind);
     void addCreature(CreatureA creature, size_t ind);
     void moveObject(size_t from, size_t to);
     std::optional<size_t> findFreeSpace(size_t ind);

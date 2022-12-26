@@ -52,17 +52,34 @@ QColor RenderWorldUseCase::getCellColor(size_t index) const
     }
     const auto & cell = m_map.at(index);
     try {
-        return std::visit(CellEnergyToColor, cell);
+        //return std::visit(CellEnergyToColor, cell);
+        return cellToColor(cell);
     } catch (std::exception e) {
         qWarning() << "something wrong accessing variant: " << e.what();
-
+        return QColor(0,0,0);
     }
     return QColor();
 }
 
 
-void RenderWorldUseCase::worldDataReady(WorldMap::WMap map)
+void RenderWorldUseCase::worldDataReady(WorldMap::WMap map, WorldInfo info)
 {
+    m_info = std::move(info);
     m_map = std::move(map);
     emit redrawWorld();
+}
+
+QColor RenderWorldUseCase::cellToColor(const Cell &c) const
+{
+    if (std::holds_alternative<CreatureA>(c)) {
+        auto creature = std::get<CreatureA>(c);
+        if (creature.isAlive()) {
+            return (creature.attackCount() > creature.photoneCount())
+                ? QColor(200,10,10,200)
+                : QColor(30,180,10,200);
+        } else {
+            return QColor(128,128,128,100);
+        }
+    }
+    return QColor(0xff,0xff,0xff,0xff);
 }

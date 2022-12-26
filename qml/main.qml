@@ -39,52 +39,67 @@ Window {
                 Text {
                     text: slider.value
                 }
-                Slider {
-                    id: slider
-                    property bool upd: true
+                Row {
+                    spacing: 10
+                    Slider {
+                        id: slider
+                        property bool upd: true
 
-                    Timer {
-                        id: waitTimer
-                        interval: 10000
-                        repeat: false
-                        running: false
-                        onTriggered: {
-                            parent.upd = true;
-                        }
-                    }
-
-                    Timer {
-                        interval: 1000
-                        repeat: true
-                        running: true
-
-
-
-                        onTriggered: {
-                            if (parent.upd) {
-                                $presenter.setSunLevel(slider.value + 1);
-                                if (slider.value > 10) {
-                                    parent.upd = false;
-                                }
-                            } else {
-                                if (slider.value > 0) {
-                                    $presenter.setSunLevel(slider.value - 1);
-                                }
-                                if (slider.value === 0) {
-                                    waitTimer.start();
-                                }
-
+                        Timer {
+                            id: waitTimer
+                            interval: 10000
+                            repeat: false
+                            running: false
+                            onTriggered: {
+                                parent.upd = true;
                             }
                         }
-                    }
 
-                    from: 0
-                    stepSize: 1
-                    value: $presenter.sunLevel
-                    to: 100
-                    onValueChanged: {
-                        console.log("helius: setSunLevel", value)
-                        $presenter.setSunLevel(value);
+                        Timer {
+                            id: tickTimer
+                            interval: 1000
+                            repeat: true
+                            running: true
+
+
+
+                            onTriggered: {
+                                if (parent.upd) {
+                                    $presenter.setSunLevel(slider.value + 1);
+                                    if (slider.value > 10) {
+                                        parent.upd = false;
+                                    }
+                                } else {
+                                    if (slider.value > 0) {
+                                        $presenter.setSunLevel(slider.value - 1);
+                                    }
+                                    if (slider.value === 0) {
+                                        waitTimer.start();
+                                    }
+
+                                }
+                            }
+                        }
+
+                        from: 0
+                        stepSize: 1
+                        value: $presenter.sunLevel
+                        to: 100
+                        onValueChanged: {
+                            console.log("helius: setSunLevel", value)
+                            $presenter.setSunLevel(value);
+                        }
+                    }
+                    Switch {
+                        id: pauseSwitch
+                        text: "pause"
+                        onCheckedChanged: {
+                            if (checked) {
+                                tickTimer.stop();
+                            } else {
+                                tickTimer.start();
+                            }
+                        }
                     }
                 }
             }

@@ -13,6 +13,7 @@ private slots:
     void TestGeometryCengerInd();
     void TestGeometryEnd();
     void TestGeometryBottom();
+    void TestLeftBorder();
 };
 
 
@@ -178,6 +179,22 @@ void TestWorldGeometry::TestGeometryBottom()
     QCOMPARE(*ns.go(dir), 9);
     dir.turnRight(); // left + up
     QCOMPARE(*ns.go(dir), 5);
+}
+
+void TestWorldGeometry::TestLeftBorder()
+{
+    // 0,1,2, 3
+    // 4,5,6, 7
+    // 8,9,10,11
+    Direction dir;
+    dir.turnLeft();
+    NearestSpace ns(4,4,3);
+    QCOMPARE(!!ns.go(dir), false);
+    dir.turnLeft();
+    QCOMPARE(!!ns.go(dir), false);
+    dir.turnLeft();
+    QCOMPARE(!!ns.go(dir), false);
+
 }
 
 QTEST_MAIN(TestWorldGeometry)

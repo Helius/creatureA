@@ -50,6 +50,13 @@ public:
         value = someValue % maxNumber;
     }
 
+//    void reverseX() {
+//        value = ;
+//    }
+//    void reverseY() {
+//        value = ;
+//    }
+
     friend bool operator== (const Direction& d1, const Direction& d2);
 
 private:
@@ -63,6 +70,7 @@ public:
     NearestSpace() = delete;
     NearestSpace(size_t index, size_t width, size_t height);
     std::optional<size_t> go(const Direction & dir) const;
+    std::optional<size_t> goBounce(Direction  dir) const;
 
 private:
     size_t m_index;

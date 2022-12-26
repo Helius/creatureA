@@ -17,6 +17,8 @@ struct WorldInfo {
     size_t totalEnegry = 0;
     size_t maxEnergyPerCreature = 0;
     size_t maxChildCount = 0;
+    size_t attacCount = 0;
+    size_t photonCount = 0;
 };
 
 
@@ -44,7 +46,7 @@ public:
     WorldProcessor(WorldMapPtr);
     ~WorldProcessor();
     void run(size_t cycles);
-    void addWalls(std::set<size_t> indexes);
+//    void addWalls(std::set<size_t> indexes);
     void addCreatures();
     const WorldMap::WMap & map() const {return m_map->m_map; };
 
@@ -59,20 +61,20 @@ public:
     void setCycles(uint newCycles);
 
 signals:
-    void ready(WorldMap::WMap map);
+    void ready(WorldMap::WMap map, WorldInfo info);
     void runWorker(WorldMapPtr world, size_t cycles, uint sunLevel);
 private slots:
     void workerReady(WorldInfo info);
 private:
     uint m_runCount = 0;
-    uint m_cycles = 1;
+    uint m_cycles = 10;
     uint m_sunLevel = 10;
     WorldMapPtr m_map;
     Worker * m_worker;
     QThread m_workerThread;
     QTimer m_timer;
     QElapsedTimer m_elapsedTimer;
-
+    bool m_inProgress = false;
 };
 
 using WorldProcessorPtr = std::shared_ptr<WorldProcessor>;

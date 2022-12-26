@@ -11,10 +11,10 @@ WorldMap::WorldMap(size_t width, size_t height)
     m_map = WMap(m_width * m_height, {EmptySpace()});
 }
 
-void WorldMap::addWall(size_t ind) {
-    Q_ASSERT(ind < m_width * m_height);
-    m_map.at(ind) = Wall();
-}
+//void WorldMap::addWall(size_t ind) {
+//    Q_ASSERT(ind < m_width * m_height);
+//    m_map.at(ind) = Wall();
+//}
 
 void WorldMap::addCreature(CreatureA creature, size_t ind)
 {
