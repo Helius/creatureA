@@ -44,11 +44,13 @@ public:
     int photoneCount() const;
     void markProcessed(bool);
     bool isProcessed() const;
+    int getDivercity() const;
+    uint getAge() const;
 
 private:
     std::array<uint8_t, 64> m_gene = {25};
     int m_energy = 500;
-    uint age = 0;
+    uint m_age = 0;
     uint m_childCount = 0;
     int m_attackCount = 0;
     int m_photonCount = 0;

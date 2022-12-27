@@ -50,7 +50,7 @@ Window {
 
                         Timer {
                             id: waitTimer
-                            interval: 10000
+                            interval: 10000/$presenter.worldSpeed
                             repeat: false
                             running: false
                             onTriggered: {
@@ -60,7 +60,7 @@ Window {
 
                         Timer {
                             id: tickTimer
-                            interval: 1000
+                            interval: 1000/$presenter.worldSpeed
                             repeat: true
                             running: true
 
@@ -85,7 +85,6 @@ Window {
                         }
 
                         onValueChanged: {
-                            console.log("helius: setSunLevel", value)
                             $presenter.setSunLevel(value);
                         }
                     }

@@ -48,7 +48,7 @@ QColor RenderWorldUseCase::getCellColor(size_t index) const
         case WorldProcessor::ShowMode::ShowEnergy:
             return std::visit(CellEnergyToColor, cell);
         case WorldProcessor::ShowMode::ShowDivercity:
-            return QColor(0, 0, 0xff);
+            return similarityToColor(cell);
         }
     } catch (std::exception e) {
         qWarning() << "something wrong accessing variant: " << e.what();
@@ -70,13 +70,34 @@ QColor RenderWorldUseCase::cellToColor(const Cell &c) const
     if (std::holds_alternative<CreatureA>(c)) {
         const CreatureA & creature = std::get<CreatureA>(c);
         if (creature.isAlive()) {
-         //   qDebug() << " ====== creature attack/photone:" << creature.attackCount() << creature.photoneCount();
-            return (creature.attackCount() > creature.photoneCount())
-                ? QColor(200,30,10,200)
-                : QColor(30,180,10,200);
+//            return (creature.attackCount() > creature.photoneCount())
+//                ? QColor(200,30,10,200)
+//                : QColor(30,180,10,200);
+
+            QColor color;
+            uint h = 120 * creature.photoneCount()/(creature.photoneCount() + creature.attackCount() + 1);
+            color.setHsv(h, 250,250);
+            return color;
         } else {
             return QColor(128,128,128,100);
         }
     }
     return QColor(0xff,0xff,0xff,0xff);
 }
+
+QColor RenderWorldUseCase::similarityToColor(const Cell &c) const
+{
+    if (std::holds_alternative<CreatureA>(c)) {
+        const CreatureA & creature = std::get<CreatureA>(c);
+        if (creature.isAlive()) {
+            QColor color;
+            auto h = creature.getDivercity()%360;
+            color.setHsv(h > 0 ? h : h + 360, 250, 250);
+            return color;
+        } else {
+            return QColor(128,128,128,100);
+        }
+    }
+    return QColor(0xff,0xff,0xff,0xff);
+}
+

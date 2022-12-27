@@ -30,6 +30,7 @@ private slots:
 
 private:
     QColor cellToColor(const Cell & c) const;
+    QColor similarityToColor (const Cell & c) const;
 
 private:
     WorldProcessorPtr m_processor;

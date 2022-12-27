@@ -1,6 +1,8 @@
 #include "creature.h"
+#include <cmath>
 #include <QRandomGenerator>
 #include <QDebug>
+
 
 
 CreatureA::CreatureA(IWorldEnv & wenv)
@@ -8,9 +10,9 @@ CreatureA::CreatureA(IWorldEnv & wenv)
 {
     for (uint i = 0; i < m_gene.size(); ++i) {
         m_gene[i] = 25;
-        if (i%16 == 0) {
-            m_gene[i] = 56;
-        }
+//        if (i%16 == 0) {
+//            m_gene[i] = 56;
+//        }
     }
 }
 
@@ -36,6 +38,12 @@ CreatureA CreatureA::clone()
 
     m_energy /= 2;
     other.m_energy = m_energy;
+
+    if (m_attackCount + m_photonCount > 1000) {
+        m_attackCount /= 8;
+        m_photonCount /= 8;
+    }
+
     other.m_attackCount = m_attackCount;
     other.m_photonCount = m_photonCount;
 
@@ -93,6 +101,20 @@ bool CreatureA::isProcessed() const
     return m_processed;
 }
 
+int CreatureA::getDivercity() const
+{
+    int difference = 0;
+    for (uint i = 0; i < m_gene.size(); ++i) {
+        difference += 25 - m_gene[i];
+    }
+    return difference;
+}
+
+uint CreatureA::getAge() const
+{
+    return m_age;
+}
+
 
 bool CreatureA::isAlive() const
 {
@@ -103,6 +125,7 @@ void CreatureA::process(size_t index)
 {
     bool finish = false;
     int maxCount = 8;
+    ++m_age;
     if (m_alive) {
         do {
             uint32_t pcNorm = pc % m_gene.size();
@@ -158,7 +181,6 @@ const std::map<uint, CreatureA::Command>CreatureA::m_commands = {
          c.m_energy += e;
          c.m_photonCount += e;
          if (c.m_energy > static_cast<int>(c.m_wenv->maxCreatureEnergy())) {
-//             c.m_energy = c.m_wenv->maxCreatureEnergy();
              c.m_wenv->divideMe(c, index);
          }
          return true;
@@ -170,7 +192,6 @@ const std::map<uint, CreatureA::Command>CreatureA::m_commands = {
          c.m_energy += e - c.m_wenv->moveEnergy();
          c.m_attackCount += e;
          if (c.m_energy > static_cast<int>(c.m_wenv->maxCreatureEnergy())) {
-//             c.m_energy = c.m_wenv->maxCreatureEnergy();
              c.m_wenv->divideMe(c, index);
          }
          return true;

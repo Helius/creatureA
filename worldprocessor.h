@@ -19,6 +19,7 @@ struct WorldInfo {
     size_t maxChildCount = 0;
     long long int attacCount = 0;
     long long int photonCount = 0;
+    uint maxAge = 0;
 };
 
 
