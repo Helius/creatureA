@@ -14,11 +14,11 @@
 struct WorldInfo {
     size_t aliveCreatures = 0;
     size_t deadCreatures = 0;
-    int totalEnegry = 0;
+    long long int totalEnegry = 0;
     int maxEnergyPerCreature = 0;
     size_t maxChildCount = 0;
-    int attacCount = 0;
-    int photonCount = 0;
+    long long int attacCount = 0;
+    long long int photonCount = 0;
 };
 
 

@@ -109,7 +109,7 @@ void WorldProcessor::workerReady(WorldInfo info)
     qDebug() << "creatures: alive/dead" << info.aliveCreatures << "/" << info.deadCreatures
              << ", energy max/total" << info.maxEnergyPerCreature << "/" << info.totalEnegry
              << ", max child" << info.maxChildCount
-             << "total attac/photon" << info.attacCount << info.photonCount;
+             << "total attac/photon" << info.attacCount << info.photonCount << "rate:" << static_cast<double>(info.attacCount)/static_cast<double>(info.photonCount);
     emit ready(m_map->m_map, info);
     m_inProgress = false;
 }
