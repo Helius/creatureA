@@ -11,13 +11,6 @@
 //    uint
 //};
 
-struct EmptySpace {
-};
-
-struct Wall {
-};
-
-using Cell = std::variant<EmptySpace, Wall, CreatureA>;
 
 class WorldMap : public IWorldEnv
 {
@@ -28,7 +21,7 @@ public:
     size_t height() const {return m_height; }
     size_t lenght() const { return m_width * m_height; }
 //    void addWall(size_t ind);
-    void addCreature(CreatureA creature, size_t ind);
+    void addCreature(const CreatureA &creature, size_t ind);
     void moveObject(size_t from, size_t to);
     std::optional<size_t> findFreeSpace(size_t ind);
 
@@ -38,8 +31,8 @@ public:
     int sunAmounnt(size_t index) override;
     uint myLevel(size_t index) override;
     bool lookAround(size_t index) override;
-    void moveTo(Direction dir, size_t index) override;
-    int attack(Direction dir, size_t index) override;
+    size_t moveTo(Direction dir, size_t index) override;
+    int attack(Direction dir, size_t & index) override;
     void divideMe(CreatureA &creature, size_t index) override;
 
     uint mutationRate() const override;
@@ -65,6 +58,10 @@ private:
     int m_moveEnegrgy = 1;
     int m_minDivideEnergy = 100;
 
+
+    // IWorldEnv interface
+public:
+    Cell &getCell(size_t index) override;
 };
 
 using WorldMapWeak = std::weak_ptr<WorldMap>;

@@ -45,7 +45,7 @@ void WorldProcessor::addCreatures(size_t amount)
 {
     while(amount--) {
         CreatureA c(*m_map);
-        m_map->addCreature(c, QRandomGenerator::global()->generate()%m_map->width());
+        m_map->addCreature(c, QRandomGenerator::global()->generate()%m_map->lenght());
     }
 }
 

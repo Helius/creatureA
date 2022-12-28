@@ -22,7 +22,7 @@ WorldMap::WorldMap(size_t width, size_t height)
 //    m_map.at(ind) = Wall();
 //}
 
-void WorldMap::addCreature(CreatureA creature, size_t ind)
+void WorldMap::addCreature(const CreatureA &creature, size_t ind)
 {
     Q_ASSERT(ind < m_width * m_height);
     m_map[ind] = { creature };
@@ -58,6 +58,11 @@ std::optional<size_t> WorldMap::findFreeSpace(size_t ind)
 void WorldMap::setSunLevel(int sunLevel)
 {
     m_sunLevel = sunLevel;
+}
+
+Cell &WorldMap::getCell(size_t index)
+{
+    return m_map[index];
 }
 
 int WorldMap::getSunLevel() const
@@ -103,7 +108,7 @@ uint8_t WorldMap::whoIsThereOffset(Direction dir, size_t index, const CreatureA 
     if (auto iopt = ns.go(dir)) {
         return std::visit(CellToType, m_map.at(*iopt));
     }
-    return 3; // wall
+    return 2; // чужой
 }
 
 int WorldMap::sunAmounnt(size_t index)
@@ -121,17 +126,19 @@ bool WorldMap::lookAround(size_t index)
     return !!findFreeSpace(index);
 }
 
-void WorldMap::moveTo(Direction dir, size_t index)
+size_t WorldMap::moveTo(Direction dir, size_t index)
 {
     NearestSpace ns(index, m_width, m_height);
     if (auto iopt = ns.go(dir)) {
         if (std::holds_alternative<EmptySpace> (m_map.at(*iopt))) {
             moveObject(index, *iopt);
+            return *iopt;
         }
     }
+    return index;
 }
 
-int WorldMap::attack(Direction dir, size_t index)
+int WorldMap::attack(Direction dir, size_t &index)
 {
     int energy = 0;
     NearestSpace ns(index, m_width, m_height);
@@ -140,6 +147,7 @@ int WorldMap::attack(Direction dir, size_t index)
             auto c = std::get<CreatureA>(m_map.at(*iopt));
             energy = c.getEnergy();
             moveObject(index, *iopt);
+            index = *iopt;
         }
     }
     return energy;

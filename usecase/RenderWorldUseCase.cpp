@@ -19,7 +19,7 @@ RenderWorldUseCase::RenderWorldUseCase(WorldProcessorPtr processor)
     Q_ASSERT(m_processor);
     connect(m_processor.get(), &WorldProcessor::ready,
         this, &RenderWorldUseCase::worldDataReady);
-    m_processor->addCreatures(10);
+    m_processor->addCreatures(100);
 }
 
 size_t RenderWorldUseCase::lenght() const
@@ -70,10 +70,6 @@ QColor RenderWorldUseCase::cellToColor(const Cell &c) const
     if (std::holds_alternative<CreatureA>(c)) {
         const CreatureA & creature = std::get<CreatureA>(c);
         if (creature.isAlive()) {
-//            return (creature.attackCount() > creature.photoneCount())
-//                ? QColor(200,30,10,200)
-//                : QColor(30,180,10,200);
-
             QColor color;
             uint h = 120 * creature.photoneCount()/(creature.photoneCount() + creature.attackCount() + 1);
             color.setHsv(h, 250,250);

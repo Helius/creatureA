@@ -4,8 +4,17 @@
 #include <functional>
 #include <map>
 #include <WorldGeometry.h>
+#include <variant>
 
 class CreatureA;
+
+struct EmptySpace {
+};
+
+struct Wall {
+};
+
+using Cell = std::variant<EmptySpace, Wall, CreatureA>;
 
 class IWorldEnv {
 public:
@@ -16,8 +25,9 @@ public:
     virtual uint myLevel(size_t index) = 0;
     virtual bool lookAround(size_t index) = 0;
 
-    virtual void moveTo(Direction dir, size_t index) = 0;
-    virtual int attack(Direction dir, size_t index) = 0;
+    virtual size_t moveTo(Direction dir, size_t index) = 0;
+    virtual int attack(Direction dir, size_t & index) = 0;
+    virtual Cell & getCell(size_t index) = 0;
 
     virtual void divideMe(CreatureA & creature, size_t fromIndex) = 0;
 

@@ -49,8 +49,6 @@ public:
     WorldProcessor(WorldMapPtr);
     ~WorldProcessor();
     void run(size_t cycles);
-//    void addWalls(std::set<size_t> indexes);
-    const WorldMap::WMap & map() const {return m_map->m_map; };
 
     // IWorldController interface
 public:
@@ -64,6 +62,7 @@ public:
     void setWorldSpeed(uint s) override;
     uint getMaxCreatureEnergy() const;
     void restart() override;
+
 public slots:
     void addCreatures(size_t amount);
 
@@ -91,7 +90,7 @@ private:
     QElapsedTimer m_elapsedTimer;
     bool m_inProgress = false;
 
-    // IWorldController interface
+    // IWorldController interface, TODO: should be in own implementation, not in worldprocessor
 public:
     void setShowMode(ShowMode mode) override;
     ShowMode showMode() const override;

@@ -27,11 +27,22 @@ CreatureA CreatureA::clone()
         other.m_gene[i] = m_gene[i];
     }
 
+    if (m_attackCount + m_photonCount > 8000) {
+        m_attackCount /= 8;
+        m_photonCount /= 8;
+    }
+
     // sometimes modify it (10% probability)
     if (generator->generate() % 100 <= m_wenv->mutationRate()) {
         uint rndIndex = generator->generate() % m_gene.size();
         uint rndGene = generator->generate() % m_gene.size();
         other.m_gene[rndIndex] = rndGene;
+
+        other.m_attackCount = 0;
+        other.m_photonCount = 0;
+    } else {
+        other.m_attackCount = m_attackCount;
+        other.m_photonCount = m_photonCount;
     }
 
     other.m_direcrion.set(generator->generate());
@@ -39,13 +50,7 @@ CreatureA CreatureA::clone()
     m_energy /= 2;
     other.m_energy = m_energy;
 
-    if (m_attackCount + m_photonCount > 1000) {
-        m_attackCount /= 8;
-        m_photonCount /= 8;
-    }
 
-    other.m_attackCount = m_attackCount;
-    other.m_photonCount = m_photonCount;
 
     m_childCount++;
 
@@ -170,8 +175,8 @@ const std::map<uint, CreatureA::Command>CreatureA::m_commands = {
     },
     // шаг в направлении direction
     {10, [](CreatureA & c, size_t index)->bool {
-         c.m_wenv->moveTo(c.m_direcrion, index);
          c.m_energy -= c.m_wenv->moveEnergy();
+         c.m_wenv->moveTo(c.m_direcrion, index);
          return true;
      }
     },
@@ -179,8 +184,9 @@ const std::map<uint, CreatureA::Command>CreatureA::m_commands = {
     {25, [](CreatureA & c, size_t index)->bool {
          auto e = c.m_wenv->sunAmounnt(index);
          c.m_energy += e;
-         c.m_photonCount += e;
-         if (c.m_energy > static_cast<int>(c.m_wenv->maxCreatureEnergy())) {
+         //c.m_photonCount += e;
+         ++c.m_photonCount;
+         if (c.m_energy > c.m_wenv->maxCreatureEnergy()) {
              c.m_wenv->divideMe(c, index);
          }
          return true;
@@ -188,18 +194,26 @@ const std::map<uint, CreatureA::Command>CreatureA::m_commands = {
     },
     // атака
     {32, [](CreatureA & c, size_t index)->bool {
+         //CreatureA local = c;
+         auto wenv = c.m_wenv;
+         ++c.m_attackCount;
          int e = c.m_wenv->attack(c.m_direcrion, index);
-         c.m_energy += e - c.m_wenv->moveEnergy();
-         c.m_attackCount += e;
-         if (c.m_energy > static_cast<int>(c.m_wenv->maxCreatureEnergy())) {
-             c.m_wenv->divideMe(c, index);
+
+         Cell & cell = wenv->getCell(index);
+         CreatureA & n = std::get<CreatureA>(cell);
+
+         n.m_energy += e - n.m_wenv->moveEnergy();
+         //n.m_attackCount += e;
+//         ++n.m_attackCount;
+         if (n.m_energy > n.m_wenv->maxCreatureEnergy()) {
+             n.m_wenv->divideMe(n, index);
          }
          return true;
      }
     },
     // делиться
     {56, [](CreatureA & c, size_t index)->bool {
-         if (c.getEnergy() > static_cast<int>(c.m_wenv->minDivideEnergy())) {
+         if (c.getEnergy() > c.m_wenv->minDivideEnergy()) {
              c.m_wenv->divideMe(c, index);
              return true;
          }
@@ -209,7 +223,7 @@ const std::map<uint, CreatureA::Command>CreatureA::m_commands = {
     // на каком я уровне
     {13, [](CreatureA & c, size_t index)->bool {
          auto level = c.m_wenv->myLevel(index);
-         if (level < c.m_gene[c.pc+1]) {
+         if (level < c.m_gene[(c.pc+1)%c.m_gene.size()]) {
              c.pc += 1;
          } else {
              c.pc += 2;
@@ -220,7 +234,7 @@ const std::map<uint, CreatureA::Command>CreatureA::m_commands = {
     // какая моя энергия
     {40, [](CreatureA & c, size_t)->bool {
          auto level = (64*c.getEnergy())/c.m_wenv->maxCreatureEnergy();
-         if (level < c.m_gene[c.pc+1]) {
+         if (level < c.m_gene[(c.pc+1)%c.m_gene.size()]) {
              c.pc += 1;
          } else {
              c.pc += 2;

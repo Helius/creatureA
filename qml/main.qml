@@ -60,7 +60,7 @@ Window {
 
                         Timer {
                             id: tickTimer
-                            interval: 1000/$presenter.worldSpeed
+                            interval: 1000
                             repeat: true
                             running: true
 
